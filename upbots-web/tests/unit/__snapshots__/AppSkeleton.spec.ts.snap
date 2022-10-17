@@ -1,0 +1,180 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AppSkeleton.vue mount type "card" 1`] = `
+<div><svg width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" version="1.1">
+    <rect style="fill: url(#6kgjdkwyvd4);" clip-path="url(#husfxph3u2o)" x="0" y="0" width="100%" height="100%"></rect>
+    <defs>
+      <clipPath id="husfxph3u2o">
+        <rect x="50%" y="20" rx="8" width="190" height="14" transform="translate(-95)"></rect>
+        <rect x="50%" y="45" rx="8" width="120" height="12" transform="translate(-60)"></rect>
+        <rect x="60" y="80" rx="8" width="70" height="12"></rect>
+        <rect x="60" y="100" rx="8" width="100" height="12"></rect>
+        <rect x="100%" y="80" rx="8" width="100" height="12" transform="translate(-160)"></rect>
+        <rect x="100%" y="100" rx="8" width="60" height="12" transform="translate(-160)"></rect>
+        <rect x="60" y="130" rx="8" width="90" height="12"></rect>
+        <rect x="60" y="150" rx="8" width="100" height="12"></rect>
+        <rect x="100%" y="130" rx="8" width="100" height="12" transform="translate(-160)"></rect>
+        <rect x="100%" y="150" rx="8" width="80" height="12" transform="translate(-160)"></rect>
+      </clipPath>
+      <linearGradient id="6kgjdkwyvd4">
+        <stop offset="0%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-2; 1" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="50%" stop-color="#a7c7d8" stop-opacity="1">
+          <animate attributeName="offset" values="-1.5; 1.5" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="100%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-1; 2" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+      </linearGradient>
+    </defs>
+  </svg></div>
+`;
+
+exports[`AppSkeleton.vue mount type "lineChart" 1`] = `
+<div><svg width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" version="1.1">
+    <rect style="fill: url(#vipg4xf7rcn);" clip-path="url(#d0kw5tmsi8c)" x="0" y="0" width="100%" height="100%"></rect>
+    <defs>
+      <clipPath id="d0kw5tmsi8c">
+        <rect x="8" y="10" rx="0" ry="0" width="2" height="180"></rect>
+        <rect x="8" y="190" rx="0" ry="0" width="380" height="2"></rect>
+        <path d="M20,60 C240,240 190,-30 380.00,50 L380,180 L20,180 Z"></path>
+      </clipPath>
+      <linearGradient id="vipg4xf7rcn">
+        <stop offset="0%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-2; 1" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="50%" stop-color="#a7c7d8" stop-opacity="1">
+          <animate attributeName="offset" values="-1.5; 1.5" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="100%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-1; 2" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+      </linearGradient>
+    </defs>
+  </svg></div>
+`;
+
+exports[`AppSkeleton.vue mount type "pieChart" 1`] = `
+<div><svg width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" version="1.1">
+    <rect style="fill: url(#7wit26ja9it);" clip-path="url(#hf3cml38l5d)" x="0" y="0" width="100%" height="100%"></rect>
+    <defs>
+      <clipPath id="hf3cml38l5d">
+        <circle cx="240" cy="100" r="80"></circle>
+        <rect x="60" y="40" rx="10" ry="10" width="10" height="10"></rect>
+        <rect x="80" y="40" rx="5" ry="10" width="40" height="10"></rect>
+        <rect x="60" y="55" rx="10" ry="10" width="10" height="10"></rect>
+        <rect x="80" y="55" rx="5" ry="10" width="40" height="10"></rect>
+        <rect x="60" y="70" rx="10" ry="10" width="10" height="10"></rect>
+        <rect x="80" y="70" rx="5" ry="10" width="40" height="10"></rect>
+        <rect x="60" y="85" rx="10" ry="10" width="10" height="10"></rect>
+        <rect x="80" y="85" rx="5" ry="10" width="40" height="10"></rect>
+      </clipPath>
+      <linearGradient id="7wit26ja9it">
+        <stop offset="0%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-2; 1" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="50%" stop-color="#a7c7d8" stop-opacity="1">
+          <animate attributeName="offset" values="-1.5; 1.5" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="100%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-1; 2" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+      </linearGradient>
+    </defs>
+  </svg></div>
+`;
+
+exports[`AppSkeleton.vue mount type "table" 1`] = `
+<div><svg width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" version="1.1">
+    <rect style="fill: url(#o5uc01tei7r);" clip-path="url(#5h9jn2itlm8)" x="0" y="0" width="100%" height="100%"></rect>
+    <defs>
+      <clipPath id="5h9jn2itlm8">
+        <rect x="51" y="45" rx="3" ry="3" width="906" height="17"></rect>
+        <circle cx="879" cy="123" r="11"></circle>
+        <circle cx="914" cy="123" r="11"></circle>
+        <rect x="104" y="115" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="305" y="114" rx="3" ry="3" width="299" height="15"></rect>
+        <rect x="661" y="114" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="55" y="155" rx="3" ry="3" width="897" height="2"></rect>
+        <circle cx="880" cy="184" r="11"></circle>
+        <circle cx="915" cy="184" r="11"></circle>
+        <rect x="105" y="176" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="306" y="175" rx="3" ry="3" width="299" height="15"></rect>
+        <rect x="662" y="175" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="56" y="216" rx="3" ry="3" width="897" height="2"></rect>
+        <circle cx="881" cy="242" r="11"></circle>
+        <circle cx="916" cy="242" r="11"></circle>
+        <rect x="106" y="234" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="307" y="233" rx="3" ry="3" width="299" height="15"></rect>
+        <rect x="663" y="233" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="57" y="274" rx="3" ry="3" width="897" height="2"></rect>
+        <circle cx="882" cy="303" r="11"></circle>
+        <circle cx="917" cy="303" r="11"></circle>
+        <rect x="107" y="295" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="308" y="294" rx="3" ry="3" width="299" height="15"></rect>
+        <rect x="664" y="294" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="58" y="335" rx="3" ry="3" width="897" height="2"></rect>
+        <circle cx="881" cy="363" r="11"></circle>
+        <circle cx="916" cy="363" r="11"></circle>
+        <rect x="106" y="355" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="307" y="354" rx="3" ry="3" width="299" height="15"></rect>
+        <rect x="663" y="354" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="57" y="395" rx="3" ry="3" width="897" height="2"></rect>
+        <circle cx="882" cy="424" r="11"></circle>
+        <circle cx="917" cy="424" r="11"></circle>
+        <rect x="107" y="416" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="308" y="415" rx="3" ry="3" width="299" height="15"></rect>
+        <rect x="664" y="415" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="55" y="453" rx="3" ry="3" width="897" height="2"></rect>
+        <rect x="51" y="49" rx="3" ry="3" width="2" height="465"></rect>
+        <rect x="955" y="49" rx="3" ry="3" width="2" height="465"></rect>
+        <circle cx="882" cy="484" r="11"></circle>
+        <circle cx="917" cy="484" r="11"></circle>
+        <rect x="107" y="476" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="308" y="475" rx="3" ry="3" width="299" height="15"></rect>
+        <rect x="664" y="475" rx="3" ry="3" width="141" height="15"></rect>
+        <rect x="52" y="513" rx="3" ry="3" width="904" height="2"></rect>
+        <rect x="52" y="80" rx="0" ry="0" width="904" height="17"></rect>
+        <rect x="52" y="57" rx="3" ry="3" width="68" height="33"></rect>
+        <rect x="222" y="54" rx="3" ry="3" width="149" height="33"></rect>
+        <rect x="544" y="55" rx="3" ry="3" width="137" height="33"></rect>
+        <rect x="782" y="56" rx="3" ry="3" width="72" height="33"></rect>
+        <rect x="933" y="54" rx="3" ry="3" width="24" height="33"></rect>
+      </clipPath>
+      <linearGradient id="o5uc01tei7r">
+        <stop offset="0%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-2; 1" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="50%" stop-color="#a7c7d8" stop-opacity="1">
+          <animate attributeName="offset" values="-1.5; 1.5" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="100%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-1; 2" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+      </linearGradient>
+    </defs>
+  </svg></div>
+`;
+
+exports[`AppSkeleton.vue mount without props 1`] = `
+<div><svg width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" version="1.1">
+    <rect style="fill: url(#laqo9kgi19l);" clip-path="url(#40ce5w19dyx)" x="0" y="0" width="100%" height="100%"></rect>
+    <defs>
+      <clipPath id="40ce5w19dyx">
+        <rect x="0" y="0" rx="5" ry="5" width="100%" height="100%"></rect>
+      </clipPath>
+      <linearGradient id="laqo9kgi19l">
+        <stop offset="0%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-2; 1" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="50%" stop-color="#a7c7d8" stop-opacity="1">
+          <animate attributeName="offset" values="-1.5; 1.5" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+        <stop offset="100%" stop-color="#E4EEF3" stop-opacity="1">
+          <animate attributeName="offset" values="-1; 2" dur="1s" repeatCount="indefinite"></animate>
+        </stop>
+      </linearGradient>
+    </defs>
+  </svg></div>
+`;

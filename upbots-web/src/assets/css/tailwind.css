@@ -1,0 +1,28 @@
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+@layer utilities {
+  @variants dark {
+    .bg-primary-dark-radial {
+      background: linear-gradient(128.47deg, #2F4159 21.26%, rgba(32, 44, 61, 0.56) 78.06%), linear-gradient(0deg, #272B31, #272B31), #0E131A;
+    }
+  }
+}
+
+@layer base {
+  html {
+    @apply w-full h-full;
+    font-size: 15px;
+  }
+
+  body {
+    @apply font-base text-base h-full w-full bg-white-lilac dark:bg-primary-dark-radial;
+  }
+
+  #app {
+    @apply flex flex-col h-full w-full;
+  }
+}

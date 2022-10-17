@@ -1,0 +1,45 @@
+.checkbox__inner.is-primary:not(.is-disabled):hover .icon-circle-checkbox {
+  @apply text-passionate-blueberry dark:text-frostbite;
+}
+
+.checkbox__inner.is-primary .checkbox__wrap,
+.checkbox__inner.is-primary .checkbox__label {
+  @apply text-chicory-flower dark:text-downy-second;
+
+}
+
+.checkbox__inner.is-secondary:not(.is-disabled):hover .checkbox__wrap {
+  @apply bg-blair bg-opacity-10;
+}
+
+.checkbox__inner.is-secondary.is-checked .checkbox__wrap {
+  @apply bg-blair bg-opacity-10;
+}
+
+.checkbox__inner.is-secondary .checkbox__wrap {
+  @apply rounded-sm;
+}
+
+.checkbox__inner.is-secondary .checkbox__wrap,
+.checkbox__inner.is-secondary .checkbox__label {
+  @apply text-chicory-flower dark:text-blair;
+}
+
+.checkbox__inner.is-tertiary:not(.is-disabled):hover .icon-circle-checkbox {
+  @apply text-let-it-snow;
+}
+
+.checkbox__inner.is-tertiary .checkbox__wrap,
+.checkbox__inner.is-tertiary .checkbox__label {
+  @apply text-let-it-snow;
+
+}
+
+.checkbox__inner.is-disabled {
+  @apply opacity-50 select-none cursor-not-allowed;
+}
+
+.checkbox__inner.is-disabled .checkbox__wrap,
+.checkbox__inner.is-disabled .checkbox__label {
+  @apply pointer-events-none;
+}

@@ -1,0 +1,1331 @@
+# Trigger 3
+
+kind: pipeline
+name: unit-test
+type: kubernetes
+
+trigger:
+  event:
+  - push
+  - tag
+
+globals:
+  - &docker_credentials
+    config:
+      from_secret: docker-credentials-config
+    username:
+      from_secret: docker-credentials-username
+    password:
+      from_secret: docker-credentials-password
+
+steps:
+- name: front
+  image: busybox
+  commands:
+  - 'echo "repo_branch: ${DRONE_REPO_BRANCH}, commit: ${DRONE_COMMIT_SHA:0:10}, tag: ${DRONE_TAG}, branch: ${DRONE_BRANCH}, commit_branch: ${DRONE_COMMIT_BRANCH}, source_branch: ${DRONE_SOURCE_BRANCH}, target_branch: ${DRONE_TARGET_BRANCH}"'
+  - 'echo "Empty pre build unit test pipeline"'
+
+image_pull_secrets:
+- docker-credentials-config
+
+---
+
+kind: pipeline
+name: pre-build-integration-test
+type: kubernetes
+
+trigger:
+  event:
+  - push
+  - tag
+
+globals:
+  - &docker_credentials
+    config:
+      from_secret: docker-credentials-config
+    username:
+      from_secret: docker-credentials-username
+    password:
+      from_secret: docker-credentials-password
+
+steps:
+- name: front
+  image: busybox
+  commands:
+  - 'echo "repo_branch: ${DRONE_REPO_BRANCH}, commit: ${DRONE_COMMIT_SHA:0:10}, tag: ${DRONE_TAG}, branch: ${DRONE_BRANCH}, commit_branch: ${DRONE_COMMIT_BRANCH}, source_branch: ${DRONE_SOURCE_BRANCH}, target_branch: ${DRONE_TARGET_BRANCH}"'
+  - 'echo "Empty pre build integration test pipeline"'
+
+image_pull_secrets:
+- docker-credentials-config
+
+---
+
+kind: pipeline
+name: pre-build-e2e-test
+type: kubernetes
+
+trigger:
+  event:
+  - push
+  - tag
+
+globals:
+  - &docker_credentials
+    config:
+      from_secret: docker-credentials-config
+    username:
+      from_secret: docker-credentials-username
+    password:
+      from_secret: docker-credentials-password
+
+steps:
+- name: front
+  image: busybox
+  commands:
+  - 'echo "repo_branch: ${DRONE_REPO_BRANCH}, commit: ${DRONE_COMMIT_SHA:0:10}, tag: ${DRONE_TAG}, branch: ${DRONE_BRANCH}, commit_branch: ${DRONE_COMMIT_BRANCH}, source_branch: ${DRONE_SOURCE_BRANCH}, target_branch: ${DRONE_TARGET_BRANCH}"'
+  - 'echo "Empty pre build e2e test pipeline"'
+
+image_pull_secrets:
+- docker-credentials-config
+
+---
+
+kind: pipeline
+name: build
+type: kubernetes
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/heads/staging
+  - refs/heads/develop
+  - refs/heads/release/prod
+  - refs/heads/release/staging
+  - refs/heads/release/dev
+  - refs/tags/v*
+  event:
+  - push
+  - tag
+
+depends_on:
+- unit-test
+- pre-build-integration-test
+- pre-build-e2e-test
+
+globals:
+  - &build_step_env
+    DOCKER_CONFIG_JSON:
+      from_secret: docker-credentials-config
+    DOCKER_REGISTRY: 663938142189.dkr.ecr.us-east-2.amazonaws.com
+    NODE_ENV_prod: production
+    NODE_ENV_staging: production
+    NODE_ENV_dev: production
+  - &build_step_volumes
+    volumes:
+    - name: docker-var-run
+      path: /var/run
+  - &build_step_settings
+    image: docker
+    depends_on:
+    - wait-for-docker-service
+    <<: *build_step_volumes
+  - &front_next_build_env_prod
+    BUILD_TAG_SUFFIX_next_prod: prod
+    VUE_APP_ROOT_API_next_prod:
+      from_secret: front-VUE_APP_ROOT_API-next-prod
+    VUE_APP_STAKING_PROMONAME_next_prod:
+      from_secret: front-VUE_APP_STAKING_PROMONAME-next-prod
+    VUE_APP_RECAPTCHA_SITE_KEY_next_prod:
+      from_secret: front-VUE_APP_RECAPTCHA_SITE_KEY-next-prod
+    VUE_APP_WEB3_PROVIDER_INFURA_next_prod:
+      from_secret: front-VUE_APP_WEB3_PROVIDER_INFURA-next-prod
+    VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS-next-prod
+    VUE_APP_UBXT_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_UBXT_ADDRESS-next-prod
+    VUE_APP_STAKING_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_STAKING_ADDRESS-next-prod
+    VUE_APP_UBXG_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_UBXG_ADDRESS-next-prod
+    VUE_APP_LP_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_LP_ADDRESS-next-prod
+    VUE_APP_UBXT_PAIR_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_UBXT_PAIR_ADDRESS-next-prod
+    VUE_APP_ETH_USDT_PAIR_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_ETH_USDT_PAIR_ADDRESS-next-prod
+    VUE_APP_BSC_STAKING_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_BSC_STAKING_ADDRESS-next-prod
+    VUE_APP_BSC_UBXT_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_BSC_UBXT_ADDRESS-next-prod
+    VUE_APP_BSC_LP_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_BSC_LP_ADDRESS-next-prod
+    VUE_APP_BSC_UBXT_PAIR_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_BSC_UBXT_PAIR_ADDRESS-next-prod
+    VUE_APP_WEB3_CALLBACK_TIMER_next_prod:
+      from_secret: front-VUE_APP_WEB3_CALLBACK_TIMER-next-prod
+    VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM_next_prod:
+      from_secret: front-VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM-next-prod
+    VUE_APP_ENABLE_PERF_FEES_FEATURE_next_prod:
+      from_secret: front-VUE_APP_ENABLE_PERF_FEES_FEATURE-next-prod
+    VUE_APP_ENABLE_BETA_SERVER_next_prod:
+      from_secret: front-VUE_APP_ENABLE_BETA_SERVER-next-prod
+    VUE_APP_WEB3_BSC_RPC_ENDPOINT_next_prod:
+      from_secret: front-VUE_APP_WEB3_BSC_RPC_ENDPOINT-next-prod
+    VUE_APP_WEB3_PROVIDER_INFURA_ID_next_prod:
+      from_secret: front-VUE_APP_WEB3_PROVIDER_INFURA_ID-next-prod
+    VUE_APP_GA_ID_next_prod:
+      from_secret: front-VUE_APP_GA_ID-next-prod
+    VUE_APP_LOCAL_STORAGE_TOKEN_NAME_next_prod:
+      from_secret: front-VUE_APP_LOCAL_STORAGE_TOKEN_NAME-next-prod
+    VUE_APP_LOCAL_STORAGE_USER_NAME_next_prod:
+      from_secret: front-VUE_APP_LOCAL_STORAGE_USER_NAME-next-prod
+    VUE_APP_CP_LTCT_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_CP_LTCT_ADDRESS-next-prod
+    VUE_APP_CP_IPNS_HANDLER_next_prod:
+      from_secret: front-VUE_APP_CP_IPNS_HANDLER-next-prod
+    VUE_APP_CP_SUCCESS_URL_next_prod:
+      from_secret: front-VUE_APP_CP_SUCCESS_URL-next-prod
+    VUE_APP_CP_CANCEL_URL_next_prod:
+      from_secret: front-VUE_APP_CP_CANCEL_URL-next-prod
+    VUE_APP_VAULT_ADDRESS_next_prod:
+      from_secret: front-VUE_APP_VAULT_ADDRESS-next-prod
+    VUE_APP_UBXT_TOKEN_next_prod:
+      from_secret: front-VUE_APP_UBXT_TOKEN-next-prod
+    VUE_APP_INDACOIN_URL_next_prod:
+      from_secret: front-VUE_APP_INDACOIN_URL-next-prod
+
+  - &front_next_build_env_staging
+    BUILD_TAG_SUFFIX_next_staging: staging
+    VUE_APP_ROOT_API_next_staging:
+      from_secret: front-VUE_APP_ROOT_API-next-staging
+    VUE_APP_STAKING_PROMONAME_next_staging:
+      from_secret: front-VUE_APP_STAKING_PROMONAME-next-staging
+    VUE_APP_RECAPTCHA_SITE_KEY_next_staging:
+      from_secret: front-VUE_APP_RECAPTCHA_SITE_KEY-next-staging
+    VUE_APP_WEB3_PROVIDER_INFURA_next_staging:
+      from_secret: front-VUE_APP_WEB3_PROVIDER_INFURA-next-staging
+    VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS-next-staging
+    VUE_APP_UBXT_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_UBXT_ADDRESS-next-staging
+    VUE_APP_STAKING_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_STAKING_ADDRESS-next-staging
+    VUE_APP_UBXG_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_UBXG_ADDRESS-next-staging
+    VUE_APP_LP_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_LP_ADDRESS-next-staging
+    VUE_APP_UBXT_PAIR_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_UBXT_PAIR_ADDRESS-next-staging
+    VUE_APP_ETH_USDT_PAIR_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_ETH_USDT_PAIR_ADDRESS-next-staging
+    VUE_APP_BSC_STAKING_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_BSC_STAKING_ADDRESS-next-staging
+    VUE_APP_BSC_UBXT_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_BSC_UBXT_ADDRESS-next-staging
+    VUE_APP_BSC_LP_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_BSC_LP_ADDRESS-next-staging
+    VUE_APP_BSC_UBXT_PAIR_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_BSC_UBXT_PAIR_ADDRESS-next-staging
+    VUE_APP_WEB3_CALLBACK_TIMER_next_staging:
+      from_secret: front-VUE_APP_WEB3_CALLBACK_TIMER-next-staging
+    VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM_next_staging:
+      from_secret: front-VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM-next-staging
+    VUE_APP_ENABLE_PERF_FEES_FEATURE_next_staging:
+      from_secret: front-VUE_APP_ENABLE_PERF_FEES_FEATURE-next-staging
+    VUE_APP_BETA_SERVER_next_staging:
+      from_secret: front-VUE_APP_BETA_SERVER-next-staging
+    VUE_APP_WEB3_BSC_RPC_ENDPOINT_next_staging:
+      from_secret: front-VUE_APP_WEB3_BSC_RPC_ENDPOINT-next-staging
+    VUE_APP_WEB3_PROVIDER_INFURA_ID_next_staging:
+      from_secret: front-VUE_APP_WEB3_PROVIDER_INFURA_ID-next-staging
+    VUE_APP_GA_ID_next_staging:
+      from_secret: front-VUE_APP_GA_ID-next-staging
+    VUE_APP_LOCAL_STORAGE_TOKEN_NAME_next_staging:
+      from_secret: front-VUE_APP_LOCAL_STORAGE_TOKEN_NAME-next-staging
+    VUE_APP_LOCAL_STORAGE_USER_NAME_next_staging:
+      from_secret: front-VUE_APP_LOCAL_STORAGE_USER_NAME-next-staging
+    VUE_APP_CP_LTCT_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_CP_LTCT_ADDRESS-next-staging
+    VUE_APP_CP_IPNS_HANDLER_next_staging:
+      from_secret: front-VUE_APP_CP_IPNS_HANDLER-next-staging
+    VUE_APP_CP_SUCCESS_URL_next_staging:
+      from_secret: front-VUE_APP_CP_SUCCESS_URL-next-staging
+    VUE_APP_CP_CANCEL_URL_next_staging:
+      from_secret: front-VUE_APP_CP_CANCEL_URL-next-staging
+    VUE_APP_VAULT_ADDRESS_next_staging:
+      from_secret: front-VUE_APP_VAULT_ADDRESS-next-staging
+    VUE_APP_UBXT_TOKEN_next_staging:
+      from_secret: front-VUE_APP_UBXT_TOKEN-next-staging
+    VUE_APP_INDACOIN_URL_next_staging:
+      from_secret: front-VUE_APP_INDACOIN_URL-next-staging
+
+  - &front_next_build_env_dev
+    BUILD_TAG_SUFFIX_next_dev: dev
+    VUE_APP_ROOT_API_next_dev:
+      from_secret: front-VUE_APP_ROOT_API-next-dev
+    VUE_APP_STAKING_PROMONAME_next_dev:
+      from_secret: front-VUE_APP_STAKING_PROMONAME-next-dev
+    VUE_APP_RECAPTCHA_SITE_KEY_next_dev:
+      from_secret: front-VUE_APP_RECAPTCHA_SITE_KEY-next-dev
+    VUE_APP_WEB3_PROVIDER_INFURA_next_dev:
+      from_secret: front-VUE_APP_WEB3_PROVIDER_INFURA-next-dev
+    VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS-next-dev
+    VUE_APP_UBXT_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_UBXT_ADDRESS-next-dev
+    VUE_APP_STAKING_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_STAKING_ADDRESS-next-dev
+    VUE_APP_UBXG_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_UBXG_ADDRESS-next-dev
+    VUE_APP_LP_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_LP_ADDRESS-next-dev
+    VUE_APP_UBXT_PAIR_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_UBXT_PAIR_ADDRESS-next-dev
+    VUE_APP_ETH_USDT_PAIR_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_ETH_USDT_PAIR_ADDRESS-next-dev
+    VUE_APP_BSC_STAKING_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_BSC_STAKING_ADDRESS-next-dev
+    VUE_APP_BSC_UBXT_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_BSC_UBXT_ADDRESS-next-dev
+    VUE_APP_BSC_LP_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_BSC_LP_ADDRESS-next-dev
+    VUE_APP_BSC_UBXT_PAIR_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_BSC_UBXT_PAIR_ADDRESS-next-dev
+    VUE_APP_WEB3_CALLBACK_TIMER_next_dev:
+      from_secret: front-VUE_APP_WEB3_CALLBACK_TIMER-next-dev
+    VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM_next_dev:
+      from_secret: front-VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM-next-dev
+    VUE_APP_ENABLE_PERF_FEES_FEATURE_next_dev:
+      from_secret: front-VUE_APP_ENABLE_PERF_FEES_FEATURE-next-dev
+    VUE_APP_BETA_SERVER_next_dev:
+      from_secret: front-VUE_APP_BETA_SERVER-next-dev
+    VUE_APP_WEB3_BSC_RPC_ENDPOINT_next_dev:
+      from_secret: front-VUE_APP_WEB3_BSC_RPC_ENDPOINT-next-dev
+    VUE_APP_WEB3_PROVIDER_INFURA_ID_next_dev:
+      from_secret: front-VUE_APP_WEB3_PROVIDER_INFURA_ID-next-dev
+    VUE_APP_GA_ID_next_dev:
+      from_secret: front-VUE_APP_GA_ID-next-dev
+    VUE_APP_LOCAL_STORAGE_TOKEN_NAME_next_dev:
+      from_secret: front-VUE_APP_LOCAL_STORAGE_TOKEN_NAME-next-dev
+    VUE_APP_LOCAL_STORAGE_USER_NAME_next_dev:
+      from_secret: front-VUE_APP_LOCAL_STORAGE_USER_NAME-next-dev
+    VUE_APP_CP_LTCT_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_CP_LTCT_ADDRESS-next-dev
+    VUE_APP_CP_IPNS_HANDLER_next_dev:
+      from_secret: front-VUE_APP_CP_IPNS_HANDLER-next-dev
+    VUE_APP_CP_SUCCESS_URL_next_dev:
+      from_secret: front-VUE_APP_CP_SUCCESS_URL-next-dev
+    VUE_APP_CP_CANCEL_URL_next_dev:
+      from_secret: front-VUE_APP_CP_CANCEL_URL-next-dev
+    VUE_APP_VAULT_ADDRESS_next_dev:
+      from_secret: front-VUE_APP_VAULT_ADDRESS-next-dev
+    VUE_APP_UBXT_TOKEN_next_dev:
+      from_secret: front-VUE_APP_UBXT_TOKEN-next-dev
+    VUE_APP_INDACOIN_URL_next_dev:
+      from_secret: front-VUE_APP_INDACOIN_URL-next-dev
+
+steps:
+- name: wait-for-docker-service
+  image: docker
+  <<: *build_step_volumes
+  commands:
+  - 'while true; do docker version && break || sleep 1; done'
+
+- name: front
+  <<: *build_step_settings
+  environment:
+    <<: *build_step_env
+    <<: *front_next_build_env_prod
+    <<: *front_next_build_env_staging
+    <<: *front_next_build_env_dev
+  commands:
+  - 'echo "repo_branch: ${DRONE_REPO_BRANCH}, commit: ${DRONE_COMMIT_SHA:0:10}, tag: ${DRONE_TAG}, branch: ${DRONE_BRANCH}, commit_branch: ${DRONE_COMMIT_BRANCH}, source_branch: ${DRONE_SOURCE_BRANCH}, target_branch: ${DRONE_TARGET_BRANCH}"'
+  
+  # docker authentication
+  - mkdir -p $HOME/.docker/
+  - echo $DOCKER_CONFIG_JSON > $HOME/.docker/config.json
+
+  # aws authentication
+  - apk add aws-cli
+  - eval $(aws ecr get-login --no-include-email --region us-east-2 | sed 's|https://||')
+  
+  # docker build
+  - export BUILD_SERVICE=front-next
+  - export BUILD_FOLDER=web
+  - export BUILD_VARIANT=next
+  - export BUILD_REPO="$${DOCKER_REGISTRY}/$${BUILD_SERVICE}"
+  - export BUILD_BRANCH=$${DRONE_BRANCH//\//-}
+  - export BUILD_TAG=$${DRONE_TAG}
+  
+  # docker build args
+  - export BUILD_ARGS="-f ./docker/$${BUILD_FOLDER}/Dockerfile"
+  
+  # docker build cache from
+  - export BUILD_ARGS="$${BUILD_ARGS} --cache-from $${BUILD_REPO}:develop-dev"
+  - export BUILD_ARGS="$${BUILD_ARGS} --cache-from $${BUILD_REPO}:staging-staging"
+  - export BUILD_ARGS="$${BUILD_ARGS} --cache-from $${BUILD_REPO}:master-prod"
+  - export BUILD_ARGS="$${BUILD_ARGS} --cache-from $${BUILD_REPO}:release-dev-dev"
+  - export BUILD_ARGS="$${BUILD_ARGS} --cache-from $${BUILD_REPO}:release-staging-staging"
+  - export BUILD_ARGS="$${BUILD_ARGS} --cache-from $${BUILD_REPO}:release-prod-prod"
+
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg NODE_ENV"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_ROOT_API"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_LOCAL_STORAGE_TOKEN_NAME"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_LOCAL_STORAGE_USER_NAME"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_CP_LTCT_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_CP_IPNS_HANDLER"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_CP_SUCCESS_UR"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_CP_CANCEL_URL"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_STAKING_PROMONAME"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_RECAPTCHA_SITE_KEY"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_WEB3_PROVIDER_INFURA"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_UBXT_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_STAKING_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_UBXG_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_LP_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_UBXT_PAIR_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_ETH_USDT_PAIR_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_BSC_STAKING_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_BSC_UBXT_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_BSC_LP_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_BSC_UBXT_PAIR_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_VAULT_ADDRESS"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_WEB3_CALLBACK_TIMER"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_ENABLE_PERF_FEES_FEATURE"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_BETA_SERVER"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_WEB3_BSC_RPC_ENDPOINT"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_WEB3_PROVIDER_INFURA_ID"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_GA_ID"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_BUILD_SCRIPT"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_UBXT_TOKEN"
+  - export BUILD_ARGS="$${BUILD_ARGS} --build-arg VUE_APP_INDACOIN_URL"
+
+  - if [ -n "$${DRONE_TAG}" ]; then export BUILD_ENVS='master staging develop'; fi
+  - if [ -n "$${DRONE_BRANCH}" ]; then export BUILD_ENVS=$${BUILD_BRANCH}; fi
+
+  - |
+      for BUILD_ENV in $$BUILD_ENVS
+      do
+        case $${BUILD_ENV} in
+          'master' | 'release/prod' | 'release-prod' | 'prod')
+            export BUILD_ENV=prod
+            export VUE_APP_BUILD_SCRIPT=build-prod
+            ;;
+          'staging' | 'release/staging' | 'release-staging' | 'prod')
+            export BUILD_ENV=staging
+            export VUE_APP_BUILD_SCRIPT=build-prod
+            ;;
+          'develop' | 'release/dev' | 'release-dev' | 'prod')
+            export BUILD_ENV=dev
+            export VUE_APP_BUILD_SCRIPT=build-dev
+            ;;
+          *)
+            echo "Ignoring build env $${BUILD_ENV} on build variant $${BUILD_VARIANT}"
+            exit 0
+            ;;
+        esac
+        export BUILD_ENV_ARGS=$${BUILD_ARGS}
+  
+        eval "export NODE_ENV=\$${NODE_ENV_$${BUILD_ENV}}"
+        eval "export VUE_APP_ROOT_API=\$${VUE_APP_ROOT_API_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_LOCAL_STORAGE_TOKEN_NAME=\$${VUE_APP_LOCAL_STORAGE_TOKEN_NAME_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_LOCAL_STORAGE_USER_NAME=\$${VUE_APP_LOCAL_STORAGE_USER_NAME_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_CP_LTCT_ADDRESS=\$${VUE_APP_CP_LTCT_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_CP_IPNS_HANDLER=\$${VUE_APP_CP_IPNS_HANDLER_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_CP_SUCCESS_UR=\$${VUE_APP_CP_SUCCESS_UR_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_CP_CANCEL_URL=\$${VUE_APP_CP_CANCEL_URL_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_STAKING_PROMONAME=\$${VUE_APP_STAKING_PROMONAME_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_RECAPTCHA_SITE_KEY=\$${VUE_APP_RECAPTCHA_SITE_KEY_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_WEB3_PROVIDER_INFURA=\$${VUE_APP_WEB3_PROVIDER_INFURA_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS=\$${VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_UBXT_ADDRESS=\$${VUE_APP_UBXT_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_STAKING_ADDRESS=\$${VUE_APP_STAKING_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_UBXG_ADDRESS=\$${VUE_APP_UBXG_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_LP_ADDRESS=\$${VUE_APP_LP_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_UBXT_PAIR_ADDRESS=\$${VUE_APP_UBXT_PAIR_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_ETH_USDT_PAIR_ADDRESS=\$${VUE_APP_ETH_USDT_PAIR_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_BSC_STAKING_ADDRESS=\$${VUE_APP_BSC_STAKING_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_BSC_UBXT_ADDRESS=\$${VUE_APP_BSC_UBXT_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_BSC_LP_ADDRESS=\$${VUE_APP_BSC_LP_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_BSC_UBXT_PAIR_ADDRESS=\$${VUE_APP_BSC_UBXT_PAIR_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_VAULT_ADDRESS=\$${VUE_APP_VAULT_ADDRESS_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_WEB3_CALLBACK_TIMER=\$${VUE_APP_WEB3_CALLBACK_TIMER_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM=\$${VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_ENABLE_PERF_FEES_FEATURE=\$${VUE_APP_ENABLE_PERF_FEES_FEATURE_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_BETA_SERVER=\$${VUE_APP_BETA_SERVER_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_WEB3_BSC_RPC_ENDPOINT=\$${VUE_APP_WEB3_BSC_RPC_ENDPOINT_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_WEB3_PROVIDER_INFURA_ID=\$${VUE_APP_WEB3_PROVIDER_INFURA_ID_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_GA_ID=\$${VUE_APP_GA_ID_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_UBXT_TOKEN=\$${VUE_APP_UBXT_TOKEN_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_INDACOIN_URL=\$${VUE_APP_INDACOIN_URL$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        eval "export VUE_APP_BUILD_SCRIPT=\$${VUE_APP_BUILD_SCRIPT}"
+        eval "export BUILD_TAG_SUFFIX=\$${BUILD_TAG_SUFFIX_$${BUILD_VARIANT}_$${BUILD_ENV}}"
+        # docker build tags
+        export BUILD_ENV_ARGS="$${BUILD_ENV_ARGS} -t $${BUILD_REPO}:$${DRONE_COMMIT_SHA:0:10}-$${BUILD_TAG_SUFFIX}"
+        if [ -n "$${DRONE_TAG}" ]; then export BUILD_ENV_ARGS="$${BUILD_ENV_ARGS} -t $${BUILD_REPO}:$${BUILD_TAG}-$${BUILD_TAG_SUFFIX}"; fi
+        if [ -n "$${DRONE_BRANCH}" ]; then export BUILD_ENV_ARGS="$${BUILD_ENV_ARGS} -t $${BUILD_REPO}:$${BUILD_BRANCH}-$${BUILD_TAG_SUFFIX}"; fi
+  
+        # building
+        echo "Building with docker args: $${BUILD_ENV_ARGS}"
+        docker build $BUILD_ENV_ARGS .
+      done
+      
+  - docker push $${BUILD_REPO} --all-tags
+
+- name: app
+  image: busybox
+  depends_on:
+  - front
+  commands:
+  - 'echo "repo_branch: ${DRONE_REPO_BRANCH}, commit: ${DRONE_COMMIT_SHA:0:10}, tag: ${DRONE_TAG}, branch: ${DRONE_BRANCH}, commit_branch: ${DRONE_COMMIT_BRANCH}, source_branch: ${DRONE_SOURCE_BRANCH}, target_branch: ${DRONE_TARGET_BRANCH}"'
+  - 'echo "Finished building"'
+
+services:
+- name: docker
+  image: docker:19-dind
+  privileged: true
+  volumes:
+  - name: docker-var-run
+    path: /var/run
+  - name: var-lib-docker
+    path: /var/lib/docker
+
+volumes:
+  - name: docker-var-run
+    temp: {}
+  - name: var-lib-docker
+    temp: {}
+
+image_pull_secrets:
+- docker-credentials-config
+
+---
+
+kind: pipeline
+name: post-build-integration-test
+type: kubernetes
+
+trigger:
+  ref:
+    include:
+    - refs/heads/release/prod
+    - refs/heads/release/staging
+    - refs/heads/release/dev
+  event:
+  - push
+
+depends_on:
+- build
+
+globals:
+  - &docker_credentials
+    config:
+      from_secret: docker-credentials-config
+    username:
+      from_secret: docker-credentials-username
+    password:
+      from_secret: docker-credentials-password
+
+steps:
+- name: front
+  image: busybox
+  commands:
+  - 'echo "repo_branch: ${DRONE_REPO_BRANCH}, commit: ${DRONE_COMMIT_SHA:0:10}, tag: ${DRONE_TAG}, branch: ${DRONE_BRANCH}, commit_branch: ${DRONE_COMMIT_BRANCH}, source_branch: ${DRONE_SOURCE_BRANCH}, target_branch: ${DRONE_TARGET_BRANCH}"'
+  - 'echo "Empty post build integration test pipeline"'
+    
+image_pull_secrets:
+- docker-credentials-config
+
+---
+
+kind: pipeline
+name: post-build-e2e-test
+type: kubernetes
+
+trigger:
+  ref:
+    include:
+    - refs/heads/release/prod
+    - refs/heads/release/staging
+    - refs/heads/release/dev
+  event:
+  - push
+
+depends_on:
+- build
+
+globals:
+  - &docker_credentials
+    config:
+      from_secret: docker-credentials-config
+    username:
+      from_secret: docker-credentials-username
+    password:
+      from_secret: docker-credentials-password
+
+steps:
+- name: front
+  image: busybox
+  commands:
+  - 'echo "repo_branch: ${DRONE_REPO_BRANCH}, commit: ${DRONE_COMMIT_SHA:0:10}, tag: ${DRONE_TAG}, branch: ${DRONE_BRANCH}, commit_branch: ${DRONE_COMMIT_BRANCH}, source_branch: ${DRONE_SOURCE_BRANCH}, target_branch: ${DRONE_TARGET_BRANCH}"'
+  - 'echo "Empty post build e2e test pipeline"'
+
+image_pull_secrets:
+- docker-credentials-config
+
+---
+
+kind: pipeline
+name: deploy
+type: kubernetes
+
+trigger:
+  ref:
+    include:
+    - refs/heads/release/prod
+    - refs/heads/release/staging
+    - refs/heads/release/dev
+  event:
+  - push
+
+depends_on:
+- post-build-integration-test
+- post-build-e2e-test
+
+globals:
+  - &deploy_step_env
+    DOCKER_REGISTRY: 663938142189.dkr.ecr.us-east-2.amazonaws.com
+    MANIFESTS_BASE_REPO_OWNER:
+      from_secret: manifests-base-repo-owner
+    MANIFESTS_REPO_NAME:
+      from_secret: manifests-repo-name
+    MANIFESTS_BRANCH:
+      from_secret: manifests-branch
+    DEPLOY_DEVELOPMENT_ENV:
+      from_secret: deploy-development-env
+    DEPLOY_STAGING_ENV:
+      from_secret: deploy-staging-env
+    DEPLOY_PRODUCTION_ENV:
+      from_secret: deploy-production-env
+  - &front_deploy_env_prod
+    DEPLOY_TAG_SUFFIX_prod: prod
+  - &front_deploy_env_staging
+    DEPLOY_TAG_SUFFIX_staging: staging
+  - &front_deploy_env_dev
+    DEPLOY_TAG_SUFFIX_dev: dev
+  - &docker_credentials
+    config:
+      from_secret: docker-credentials-config
+    username:
+      from_secret: docker-credentials-username
+    password:
+      from_secret: docker-credentials-password
+
+clone:
+  disable: true
+
+steps:
+- name: clone
+  image: alpine/git
+  environment:
+    <<: *deploy_step_env
+  commands:
+  - git clone -b devops $${DRONE_GIT_HTTP_URL/$${DRONE_REPO_NAME}/$${MANIFESTS_REPO_NAME}} .
+  - git checkout $${MANIFESTS_BRANCH}
+
+- name: app
+  image: 663938142189.dkr.ecr.us-east-2.amazonaws.com/deployer:v0.0.1 
+  environment:
+    <<: *deploy_step_env
+    <<: *front_deploy_env_prod
+    <<: *front_deploy_env_staging
+    <<: *front_deploy_env_dev
+  user: 0 # per drone doc, drone volume is mounted as root! should copy over to the image user but watch out for the IO in that case
+  commands:
+  - 'echo "repo_branch: ${DRONE_REPO_BRANCH}, commit: ${DRONE_COMMIT_SHA:0:10}, tag: ${DRONE_TAG}, branch: ${DRONE_BRANCH}, commit_branch: ${DRONE_COMMIT_BRANCH}, source_branch: ${DRONE_SOURCE_BRANCH}, target_branch: ${DRONE_TARGET_BRANCH}"'
+  - 'echo "Empty deploy pipeline"'
+
+  - export DEPLOY_BRANCH=$${DRONE_BRANCH//\//-}
+  - export DEPLOY_SERVICES='front-next'
+
+  - if [ -n "$${DRONE_TAG}" ]; then export DEPLOY_ENV='master'; fi
+  - if [ -n "$${DRONE_BRANCH}" ]; then export DEPLOY_ENV=$${DEPLOY_BRANCH}; fi
+
+  - |
+      case $${DEPLOY_ENV} in
+        'master' | 'release/prod' | 'release-prod' | 'prod')
+          export DEPLOY_ENV=$${DEPLOY_PRODUCTION_ENV}
+          export DEPLOY_ENV_SUFFIX=$${DEPLOY_TAG_SUFFIX_prod}
+          ;;
+        'staging' | 'release/staging' | 'release-staging' | 'staging')
+          export DEPLOY_ENV=$${DEPLOY_STAGING_ENV}
+          export DEPLOY_ENV_SUFFIX=$${DEPLOY_TAG_SUFFIX_staging}
+          ;;
+        'develop' | 'release/dev' | 'release-dev' | 'dev')
+          export DEPLOY_ENV=$${DEPLOY_DEVELOPMENT_ENV}
+          export DEPLOY_ENV_SUFFIX=$${DEPLOY_TAG_SUFFIX_dev}
+          ;;
+        *)
+          export DEPLOY_ENV=$${DEPLOY_DEVELOPMENT_ENV}
+          export DEPLOY_ENV_SUFFIX=$${DEPLOY_TAG_SUFFIX_dev}
+          ;;
+      esac
+  - cd deploy/overlays/$${DEPLOY_ENV}
+
+  - |
+      for DEPLOY_SERVICE in $$DEPLOY_SERVICES
+      do
+        case $${DEPLOY_SERVICE} in
+          'front-next')
+            export DEPLOY_TAG_SUFFIX=$${DEPLOY_ENV_SUFFIX}
+            export DEPLOY_TAG=$${DRONE_COMMIT_SHA:0:10}-$${DEPLOY_TAG_SUFFIX}
+            ;;
+          *)
+            export DEPLOY_TAG=$${DRONE_COMMIT_SHA:0:10}
+            ;;
+        esac
+        export DEPLOY_BASE_REPO="$${DOCKER_REGISTRY}/$${DEPLOY_SERVICE}"
+        export DEPLOY_REPO="$${DOCKER_REGISTRY}/$${DEPLOY_SERVICE}"
+
+        case $${DEPLOY_SERVICE} in
+          *)
+            kustomize edit set image $${DEPLOY_BASE_REPO}=$${DEPLOY_REPO}:$${DEPLOY_TAG}
+            ;;
+        esac
+      done
+  - kustomize build .
+  - cd ../../../
+  - git status
+  - git add .
+  - git commit -m "Deploying $${DRONE_COMMIT_SHA:0:10} on build $${DRONE_BUILD_NUMBER}"
+  - git push origin $${MANIFESTS_BRANCH}
+
+image_pull_secrets:
+- docker-credentials-config
+
+---
+
+kind: secret
+name: docker-credentials-config
+get:
+  path: docker-image-pull-secret
+  name: .dockerconfigjson
+
+---
+
+kind: secret
+name: docker-credentials-username
+get:
+  path: docker-credentials
+  name: username
+
+---
+
+kind: secret
+name: docker-credentials-password
+get:
+  path: docker-credentials
+  name: password
+
+---
+kind: secret
+name: manifests-base-repo-owner
+get:
+  path: deployer-step-env
+  name: MANIFESTS_BASE_REPO_OWNER
+---
+kind: secret
+name: manifests-repo-name
+get:
+  path: deployer-step-env
+  name: MANIFESTS_REPO_NAME
+---
+kind: secret
+name: manifests-branch
+get:
+  path: deployer-step-env
+  name: MANIFESTS_BRANCH
+---
+kind: secret
+name: deploy-development-env
+get:
+  path: deployer-step-env
+  name: DEPLOY_DEVELOPMENT_ENV
+---
+kind: secret
+name: deploy-staging-env
+get:
+  path: deployer-step-env
+  name: DEPLOY_STAGING_ENV
+---
+kind: secret
+name: deploy-production-env
+get:
+  path: deployer-step-env
+  name: DEPLOY_PRODUCTION_ENV
+
+# front temp embedded env - next prod
+---
+kind: secret
+name: front-VUE_APP_ROOT_API-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_ROOT_API
+---
+kind: secret
+name: front-VUE_APP_STAKING_PROMONAME-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_STAKING_PROMONAME
+---
+kind: secret
+name: front-VUE_APP_RECAPTCHA_SITE_KEY-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_RECAPTCHA_SITE_KEY
+---
+kind: secret
+name: front-VUE_APP_WEB3_PROVIDER_INFURA-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_WEB3_PROVIDER_INFURA
+---
+kind: secret
+name: front-VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXT_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_UBXT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_STAKING_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_STAKING_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXG_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_UBXG_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_LP_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_LP_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXT_PAIR_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_UBXT_PAIR_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_ETH_USDT_PAIR_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_ETH_USDT_PAIR_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_STAKING_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_BSC_STAKING_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_UBXT_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_BSC_UBXT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_LP_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_BSC_LP_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_UBXT_PAIR_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_BSC_UBXT_PAIR_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_WEB3_CALLBACK_TIMER-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_WEB3_CALLBACK_TIMER
+---
+kind: secret
+name: front-VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM
+---
+kind: secret
+name: front-VUE_APP_ENABLE_PERF_FEES_FEATURE-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_ENABLE_PERF_FEES_FEATURE
+---
+kind: secret
+name: front-VUE_APP_BETA_SERVER-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_BETA_SERVER
+---
+kind: secret
+name: front-VUE_APP_WEB3_BSC_RPC_ENDPOINT-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_WEB3_BSC_RPC_ENDPOINT
+---
+kind: secret
+name: front-VUE_APP_WEB3_PROVIDER_INFURA_ID-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_WEB3_PROVIDER_INFURA_ID
+---
+kind: secret
+name: front-VUE_APP_GA_ID-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_GA_ID
+---
+kind: secret
+name: front-VUE_APP_LOCAL_STORAGE_TOKEN_NAME-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_LOCAL_STORAGE_TOKEN_NAME
+---
+kind: secret
+name: front-VUE_APP_LOCAL_STORAGE_USER_NAME-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_LOCAL_STORAGE_USER_NAME
+---
+kind: secret
+name: front-VUE_APP_CP_LTCT_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_CP_LTCT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_CP_IPNS_HANDLER-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_CP_IPNS_HANDLER
+---
+kind: secret
+name: front-VUE_APP_CP_SUCCESS_URL-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_CP_SUCCESS_URL
+---
+kind: secret
+name: front-VUE_APP_CP_CANCEL_URL-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_CP_CANCEL_URL
+---
+kind: secret
+name: front-VUE_APP_VAULT_ADDRESS-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_VAULT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXT_TOKEN-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_UBXT_TOKEN
+---
+kind: secret
+name: front-VUE_APP_INDACOIN_URL-next-prod
+get:
+  path: front-build-env-next-prod
+  name: VUE_APP_INDACOIN_URL
+
+# front temp embedded env - next staging
+---
+kind: secret
+name: front-VUE_APP_ROOT_API-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_ROOT_API
+---
+kind: secret
+name: front-VUE_APP_STAKING_PROMONAME-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_STAKING_PROMONAME
+---
+kind: secret
+name: front-VUE_APP_RECAPTCHA_SITE_KEY-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_RECAPTCHA_SITE_KEY
+---
+kind: secret
+name: front-VUE_APP_WEB3_PROVIDER_INFURA-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_WEB3_PROVIDER_INFURA
+---
+kind: secret
+name: front-VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXT_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_UBXT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_STAKING_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_STAKING_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXG_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_UBXG_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_LP_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_LP_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXT_PAIR_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_UBXT_PAIR_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_ETH_USDT_PAIR_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_ETH_USDT_PAIR_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_STAKING_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_BSC_STAKING_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_UBXT_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_BSC_UBXT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_LP_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_BSC_LP_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_UBXT_PAIR_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_BSC_UBXT_PAIR_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_WEB3_CALLBACK_TIMER-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_WEB3_CALLBACK_TIMER
+---
+kind: secret
+name: front-VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM
+---
+kind: secret
+name: front-VUE_APP_ENABLE_PERF_FEES_FEATURE-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_ENABLE_PERF_FEES_FEATURE
+---
+kind: secret
+name: front-VUE_APP_BETA_SERVER-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_BETA_SERVER
+---
+kind: secret
+name: front-VUE_APP_WEB3_BSC_RPC_ENDPOINT-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_WEB3_BSC_RPC_ENDPOINT
+---
+kind: secret
+name: front-VUE_APP_WEB3_PROVIDER_INFURA_ID-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_WEB3_PROVIDER_INFURA_ID
+---
+kind: secret
+name: front-VUE_APP_GA_ID-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_GA_ID
+---
+kind: secret
+name: front-VUE_APP_LOCAL_STORAGE_TOKEN_NAME-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_LOCAL_STORAGE_TOKEN_NAME
+---
+kind: secret
+name: front-VUE_APP_LOCAL_STORAGE_USER_NAME-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_LOCAL_STORAGE_USER_NAME
+---
+kind: secret
+name: front-VUE_APP_CP_LTCT_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_CP_LTCT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_CP_IPNS_HANDLER-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_CP_IPNS_HANDLER
+---
+kind: secret
+name: front-VUE_APP_CP_SUCCESS_URL-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_CP_SUCCESS_URL
+---
+kind: secret
+name: front-VUE_APP_CP_CANCEL_URL-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_CP_CANCEL_URL
+---
+kind: secret
+name: front-VUE_APP_VAULT_ADDRESS-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_VAULT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXT_TOKEN-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_UBXT_TOKEN
+---
+kind: secret
+name: front-VUE_APP_INDACOIN_URL-next-staging
+get:
+  path: front-build-env-next-staging
+  name: VUE_APP_INDACOIN_URL
+
+# front temp embedded env - next dev
+---
+kind: secret
+name: front-VUE_APP_ROOT_API-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_ROOT_API
+---
+kind: secret
+name: front-VUE_APP_STAKING_PROMONAME-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_STAKING_PROMONAME
+---
+kind: secret
+name: front-VUE_APP_RECAPTCHA_SITE_KEY-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_RECAPTCHA_SITE_KEY
+---
+kind: secret
+name: front-VUE_APP_WEB3_PROVIDER_INFURA-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_WEB3_PROVIDER_INFURA
+---
+kind: secret
+name: front-VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_WEB3_UBXTOKEN_PROXY_CONTRACT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXT_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_UBXT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_STAKING_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_STAKING_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXG_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_UBXG_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_LP_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_LP_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXT_PAIR_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_UBXT_PAIR_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_ETH_USDT_PAIR_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_ETH_USDT_PAIR_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_STAKING_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_BSC_STAKING_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_UBXT_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_BSC_UBXT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_LP_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_BSC_LP_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_BSC_UBXT_PAIR_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_BSC_UBXT_PAIR_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_WEB3_CALLBACK_TIMER-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_WEB3_CALLBACK_TIMER
+---
+kind: secret
+name: front-VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_WEB3_PROVIDER_COINGECKO_API_ETHEREUM
+---
+kind: secret
+name: front-VUE_APP_ENABLE_PERF_FEES_FEATURE-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_ENABLE_PERF_FEES_FEATURE
+---
+kind: secret
+name: front-VUE_APP_BETA_SERVER-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_BETA_SERVER
+---
+kind: secret
+name: front-VUE_APP_WEB3_BSC_RPC_ENDPOINT-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_WEB3_BSC_RPC_ENDPOINT
+---
+kind: secret
+name: front-VUE_APP_WEB3_PROVIDER_INFURA_ID-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_WEB3_PROVIDER_INFURA_ID
+---
+kind: secret
+name: front-VUE_APP_GA_ID-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_GA_ID
+---
+kind: secret
+name: front-VUE_APP_LOCAL_STORAGE_TOKEN_NAME-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_LOCAL_STORAGE_TOKEN_NAME
+---
+kind: secret
+name: front-VUE_APP_LOCAL_STORAGE_USER_NAME-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_LOCAL_STORAGE_USER_NAME
+---
+kind: secret
+name: front-VUE_APP_CP_LTCT_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_CP_LTCT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_CP_IPNS_HANDLER-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_CP_IPNS_HANDLER
+---
+kind: secret
+name: front-VUE_APP_CP_SUCCESS_URL-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_CP_SUCCESS_URL
+---
+kind: secret
+name: front-VUE_APP_CP_CANCEL_URL-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_CP_CANCEL_URL
+---
+kind: secret
+name: front-VUE_APP_VAULT_ADDRESS-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_VAULT_ADDRESS
+---
+kind: secret
+name: front-VUE_APP_UBXT_TOKEN-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_UBXT_TOKEN
+---
+kind: secret
+name: front-VUE_APP_INDACOIN_URL-next-dev
+get:
+  path: front-build-env-next-dev
+  name: VUE_APP_INDACOIN_URL

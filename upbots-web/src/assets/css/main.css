@@ -1,0 +1,17 @@
+/* Fonts */
+@import '../fonts/icomoon/style.css';
+@import '../fonts/montserrat/style.css';
+@import '../fonts/luckiest-guy/style.css';
+
+/* Animations */
+@import 'animations/transitions.css';
+
+/* Helpers */
+@import 'helpers/general.css';
+@import 'helpers/custom-scrollbar.css';
+
+/* Tailwind config */
+@import 'tailwind.css';
+
+/* Swiper */
+@import 'swiper/swiper.css'

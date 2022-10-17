@@ -1,0 +1,5 @@
+export * from '@/views/auth/auth.schemas'
+export * from '@/views/profile/profile.schemas'
+export * from '@/views/keys/keys.schemas'
+export * from '@/views/home/home.schemas'
+export * from '@/views/portfolio/store/dex/dex.schemas'
